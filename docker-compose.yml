@@ -31,9 +31,42 @@ services:
     networks:
       - ILICEReverseProxy
 
+  auladb:
+    image: mysql:5.7
+    volumes:
+      - aula_hipicasolera_db_data:/var/lib/mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: somewordpress
+      MYSQL_DATABASE: wordpress
+      MYSQL_USER: wordpress
+      MYSQL_PASSWORD: wordpress
+    networks:
+      - ILICEReverseProxy
+
+  aulahipicasolera:
+    depends_on:
+      - auladb
+    image: wordpress:latest
+    container_name: aulahipicasolera
+    restart: always
+    expose:
+      - '80'
+    volumes:
+      - aula_hipicasolera_wp_folder:/var/www/html
+      - ./.htaccess:/var/www/html/.htaccess
+    environment:
+     WORDPRESS_DB_HOST: auladb:3306
+     WORDPRESS_DB_USER: wordpress
+     WORDPRESS_DB_PASSWORD: wordpress
+    networks:
+      - ILICEReverseProxy
+
 volumes:
    hipicasolera_db_data:
    hipicasolera_wp_folder:
+   aula_hipicasolera_db_data:
+   aula_hipicasolera_wp_folder:
 
 networks:
   ILICEReverseProxy:
